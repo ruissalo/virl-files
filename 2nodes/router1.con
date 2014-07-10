@@ -1,0 +1,147 @@
+version 15.3
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname router1
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+no aaa new-model
+mmi polling-interval 60
+no mmi auto-configure
+no mmi pvc
+mmi snmp-timeout 180
+!
+!
+!         
+!
+!
+!
+ip cef
+no ipv6 cef
+ipv6 multicast rpf use-bgp
+!
+multilink bundle-name authenticated
+!
+!
+!
+redundancy
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!         
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ ip address 10.10.20.110 255.255.255.0
+ duplex auto
+ speed auto
+ no shutdown
+!
+ip forward-protocol nd
+!
+!
+no ip http server
+no ip http secure-server
+!
+!
+!
+!
+control-plane
+!
+banner exec ^C
+**************************************************************************
+* vIOS - Cisco Systems Confidential                                      *
+*                                                                        *
+* This software is provided as is without warranty for internal          *
+* development and testing purposes only under the terms of the Cisco     *
+* onePK Software Development Kit License Agreement. Under no             *
+* circumstances may this software be used for production purposes or     *
+* deployed in a production environment.                                  *
+*                                                                        *
+* By using the software, you agree to abide by the terms and conditions  *
+* of the Cisco onePK Software Development Kit License Agreement as well  *
+* as the terms and conditions of the Cisco End User License Agreement at *
+* http://www.cisco.com/go/eula                                           *
+*                                                                        *
+* Unauthorized use or distribution of this software is expressly         *
+* Prohibited.                                                            *
+**************************************************************************^C
+banner incoming ^C
+**************************************************************************
+* vIOS - Cisco Systems Confidential                                      *
+*                                                                        *
+* This software is provided as is without warranty for internal          *
+* development and testing purposes only under the terms of the Cisco     *
+* onePK Software Development Kit License Agreement. Under no             *
+* circumstances may this software be used for production purposes or     *
+* deployed in a production environment.                                  *
+*                                                                        *
+* By using the software, you agree to abide by the terms and conditions  *
+* of the Cisco onePK Software Development Kit License Agreement as well  *
+* as the terms and conditions of the Cisco End User License Agreement at *
+* http://www.cisco.com/go/eula                                           *
+*                                                                        *
+* Unauthorized use or distribution of this software is expressly         *
+* Prohibited.                                                            *
+**************************************************************************^C
+banner login ^C
+**************************************************************************
+* vIOS - Cisco Systems Confidential                                      *
+*                                                                        *
+* This software is provided as is without warranty for internal          *
+* development and testing purposes only under the terms of the Cisco     *
+* onePK Software Development Kit License Agreement. Under no             *
+* circumstances may this software be used for production purposes or     *
+* deployed in a production environment.                                  *
+*                                                                        *
+* By using the software, you agree to abide by the terms and conditions  *
+* of the Cisco onePK Software Development Kit License Agreement as well  *
+* as the terms and conditions of the Cisco End User License Agreement at *
+* http://www.cisco.com/go/eula                                           *
+*                                                                        *
+* Unauthorized use or distribution of this software is expressly         *
+* Prohibited.                                                            *
+**************************************************************************^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ transport input all
+!
+onep
+ transport type tls localcert demoTP disable-remotecert-validation
+ start
+!
+!
+! IOS PKI will fail to import the tftp file if we attempt this before
+! the config has been fully applied. So if we just do:
+!   crypto pki import demoTP pkcs12 [location] [etc...]
+! We would see something similar to this in the boot log:
+!   *Nov 29 19:27:32.415: CRYPTO_PKI: Copying pkcs12 from flash1://bootstrap_admin.con
+!   *Nov 29 19:27:32.492: %PKI-6-PKCS12IMPORT_FAIL: PKCS #12 Import Failed.
+! Therefore we use a short delay before loading the pkcs12 file:
+!
+event manager applet load_identity
+ event timer countdown name Delay time 20
+ action 0.0 cli command "enable"
+ action 1.0 cli command "config terminal"
+ action 2.0 cli command "file prompt quiet"
+ action 3.0 cli command "crypto pki import demoTP pkcs12 flash2://router1.p12 password vila"
+ action 4.0 syslog msg "Loaded bootstrap identity certificate"
+!
+end
+
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.3" xsi:schemaLocation="http://www.cisco.com/VIRL http://cide.cisco.com/vmmaestro/schema/virl.xsd">
+    <node name="router1" type="SIMPLE" subtype="vios" location="188,263" vmImage="/usr/share/vmcloud/data/images/vios.ova">
+        <extensions>
+            <entry key="bootstrap configuration" type="String">/home/cisco/gits/virl-files/2nodes/router1.con</entry>
+            <entry key="import files" type="String">/home/cisco/vmcloud-example-networks/3node/router1.p12</entry>
+        </extensions>
+        <interface name="GigabitEthernet0/0"/>
+    </node>
+    <node name="router2" type="SIMPLE" subtype="vios" location="488,319" vmImage="/usr/share/vmcloud/data/images/vios.ova">
+        <extensions>
+            <entry key="bootstrap configuration" type="String">/home/cisco/gits/virl-files/2nodes/router2.con</entry>
+            <entry key="import files" type="String">/home/cisco/vmcloud-example-networks/3node/router2.p12</entry>
+        </extensions>
+        <interface name="GigabitEthernet0/0"/>
+    </node>
+    <connection src="/topology/node[1]/interface[1]" dst="/topology/node[2]/interface[1]"/>
+</topology>
